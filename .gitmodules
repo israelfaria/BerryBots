@@ -1,0 +1,4 @@
+[submodule "luajit"]
+	path = luajit
+	url = https://github.com/israelfaria/LuaJIT.git
+	branch = berrybots
