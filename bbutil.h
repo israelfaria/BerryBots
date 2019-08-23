@@ -329,7 +329,6 @@ typedef struct {
 extern double limit(double p, double q, double r);
 extern int signum(double x);
 extern double square(double x);
-extern double abs(double x);
 extern double round(double d, int x);
 extern double normalRelativeAngle(double x);
 extern double normalAbsoluteAngle(double x);

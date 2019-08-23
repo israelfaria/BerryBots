@@ -42,13 +42,6 @@ double square(double x) {
   return x * x;
 }
 
-double abs(double x) {
-  if (x < 0) {
-    return -x;
-  }
-  return x;
-}
-
 double round(double d, int x) {
   int powerTen = 1;
   for (int i = 0; i < x; i++) {
@@ -126,4 +119,3 @@ char* getTimestamp() {
   strcpy(newTimestamp, timestamp);
   return newTimestamp;
 }
-
