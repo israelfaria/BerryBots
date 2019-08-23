@@ -28,10 +28,8 @@ class TarZipper : public Zipper {
     TarZipper();
     virtual void packageFiles(const char *outputFile, const char *baseDir,
         char **filenames, int numFiles, bool binary,
-        const char *absMetaFilename, const char *metaFilename)
-        throw (ZipperException*);
-    virtual void unpackFile(const char *zipFile, const char *outputDir)
-        throw (ZipperException*);
+        const char *absMetaFilename, const char *metaFilename);
+    virtual void unpackFile(const char *zipFile, const char *outputDir);
 };
 
 #endif

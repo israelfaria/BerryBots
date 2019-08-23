@@ -39,7 +39,7 @@ GuiZipper::~GuiZipper() {
 // https://github.com/libarchive/libarchive/wiki/Examples#wiki-A_Basic_Write_Example
 void GuiZipper::packageFiles(const char *outputFile, const char *baseDir,
     char **filenames, int numFiles, bool binary, const char *absMetaFilename,
-    const char *metaFilename) throw (ZipperException*) {
+    const char *metaFilename) {
   int r;
   struct archive *a = archive_write_new();
   r = archive_write_add_filter_gzip(a);
@@ -67,7 +67,7 @@ void GuiZipper::packageFiles(const char *outputFile, const char *baseDir,
 }
 
 void GuiZipper::packageSingleFile(const char *absFilename, const char *filename,
-    struct archive *a, bool binary) throw (ZipperException*) {
+    struct archive *a, bool binary) {
   struct stat st;
   char buff[8192];
   int fd;
@@ -97,26 +97,25 @@ void GuiZipper::packageSingleFile(const char *absFilename, const char *filename,
 
 // Based on libarchive's public example code.
 // https://github.com/libarchive/libarchive/wiki/Examples#wiki-Constructing_Objects_On_Disk
-void GuiZipper::unpackFile(const char *zipFile, const char *outputDir)
-    throw (ZipperException*) {
+void GuiZipper::unpackFile(const char *zipFile, const char *outputDir) {
   // TODO: use archive_write_disk_open instead (if/when it exists)
   char cwd[4096];
   getcwd(cwd, 4096);
   char *absZipFile = fileManager_->getAbsFilePath(zipFile);
   platformstl::filesystem_traits<char> traits;
   traits.set_current_directory(outputDir);
-  
+
   struct archive *a;
   struct archive *ext;
   struct archive_entry *entry;
   int flags;
   int r;
-  
+
   flags = ARCHIVE_EXTRACT_TIME;
   flags |= ARCHIVE_EXTRACT_PERM;
   flags |= ARCHIVE_EXTRACT_ACL;
   flags |= ARCHIVE_EXTRACT_FFLAGS;
-  
+
   a = archive_read_new();
   archive_read_support_format_tar(a);
   archive_read_support_filter_gzip(a);
@@ -153,7 +152,7 @@ void GuiZipper::unpackFile(const char *zipFile, const char *outputDir)
 // Based on libarchive's public example code.
 // https://github.com/libarchive/libarchive/wiki/Examples#wiki-Constructing_Objects_On_Disk
 ssize_t GuiZipper::copyData(struct archive *ar, struct archive *aw,
-                            const char *userDirPath) throw (ZipperException*) {
+                            const char *userDirPath) {
   ssize_t r;
   const void *buff;
   size_t size;
@@ -172,8 +171,7 @@ ssize_t GuiZipper::copyData(struct archive *ar, struct archive *aw,
   }
 }
 
-void GuiZipper::checkForErrors(const char *message, struct archive *a, long r)
-    throw (ZipperException*) {
+void GuiZipper::checkForErrors(const char *message, struct archive *a, long r) {
   if (r != ARCHIVE_OK) {
     std::stringstream msgStream;
     msgStream << message << " (" << r << "): " << archive_error_string(a)

@@ -50,12 +50,12 @@ extern "C" {
 
 class EngineException : public std::exception {
   char *message_;
-  
+
   public:
     EngineException(const char *details);
     EngineException(const char *filename, const char *details);
-    ~EngineException() throw();
-    virtual const char* what() const throw();
+    ~EngineException();
+    virtual const char* what();
 };
 
 typedef struct {
@@ -140,12 +140,12 @@ class BerryBotsEngine {
     void processWinnerRanksScores();
 
     void initStage(const char *stagesBaseDir, const char *stageName,
-                   const char *cacheDir) throw (EngineException*);
+                   const char *cacheDir);
     void initShips(const char *shipsBaseDir, char **teamNames, int numTeams,
-                   const char *cacheDir) throw (EngineException*);
+                   const char *cacheDir);
     void stagePrint(const char *text);
     void shipPrint(lua_State *L, const char *text);
-    void processTick() throw (EngineException*);
+    void processTick();
     void processRoundOver();
     void processGameOver();
     void monitorCpuTimer(Team *team, bool fatal);
@@ -168,19 +168,18 @@ class BerryBotsEngine {
     void destroyShip(Ship *ship);
     static void* timer(void *vargs);
     int callUserLuaCode(lua_State *L,int nargs, const char *errorMsg,
-                        int callStyle) throw (EngineException*);
+                        int callStyle);
     ReplayBuilder* getReplayBuilder();
   private:
     void setTeamRanksByScore();
     void initShipRound(Ship *ship);
     void updateTeamShipsAlive();
-    void processStageRun() throw (EngineException*);
+    void processStageRun();
     void uniqueShipNames(Ship** ships, int numShips);
     void uniqueTeamNames(Team** teams, int numTeams);
     void copyShips(Ship **srcShips, Ship **destShips, int numShips);
     void printLuaErrorToShipConsole(lua_State *L, const char *formatString);
-    void throwForLuaError(lua_State *L, const char *formatString)
-        throw (EngineException*);
+    void throwForLuaError(lua_State *L, const char *formatString);
     char* formatLuaError(lua_State *L, const char *formatString);
 };
 

@@ -27,8 +27,8 @@ class ZipperException : public std::exception {
   char *message_;
   public:
     ZipperException(const char *details);
-    ~ZipperException() throw();
-    virtual const char* what() const throw();
+    ~ZipperException();
+    virtual const char* what();
 };
 
 class Zipper {

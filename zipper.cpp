@@ -27,10 +27,10 @@ ZipperException::ZipperException(const char *details) {
   sprintf(message_, "Zip processing failure: %s", details);
 }
 
-const char* ZipperException::what() const throw() {
+const char* ZipperException::what() {
   return message_;
 }
 
-ZipperException::~ZipperException() throw() {
+ZipperException::~ZipperException() {
   delete message_;
 }

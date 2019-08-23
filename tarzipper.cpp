@@ -20,7 +20,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <stdio.h>  
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "filemanager.h"
@@ -32,7 +32,7 @@ TarZipper::TarZipper() {
 
 void TarZipper::packageFiles(const char *outputFile, const char *baseDir,
     char **filenames, int numFiles, bool binary, const char *absMetaFilename,
-    const char *metaFilename) throw (ZipperException*) {
+    const char *metaFilename) {
   std::stringstream cmdStream;
   cmdStream << "cd \"" << baseDir << "\"; "
             << "cp \"" << absMetaFilename << "\" ./" << metaFilename << "; "
@@ -47,8 +47,7 @@ void TarZipper::packageFiles(const char *outputFile, const char *baseDir,
   }
 }
 
-void TarZipper::unpackFile(const char *zipFile, const char *outputDir)
-    throw (ZipperException*) {
+void TarZipper::unpackFile(const char *zipFile, const char *outputDir) {
   int extractCmdLen = (int) (8 + strlen(zipFile) + 4 + strlen(outputDir));
   char *extractCmd = new char[extractCmdLen + 1];
   sprintf(extractCmd, "tar xfv %s -C %s", zipFile, outputDir);

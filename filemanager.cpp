@@ -62,12 +62,12 @@ void FileManager::setListener(PackagingListener *packagingListener) {
 }
 
 char* FileManager::loadUserLuaFilename(char *userDirPath,
-    const char *metaFilename) throw (FileNotFoundException*) {
+    const char *metaFilename) {
   int userPropertiesPathLen =
       (int) (strlen(userDirPath) + 1 + strlen(metaFilename));
   char *userPropertiesPath = new char[userPropertiesPathLen + 1];
   sprintf(userPropertiesPath, "%s%s%s", userDirPath, BB_DIRSEP, metaFilename);
-  
+
   FILE *userPropertiesFile = fopen(userPropertiesPath, "r");
   if (userPropertiesFile == 0) {
     FileNotFoundException *e = new FileNotFoundException(userPropertiesPath);
@@ -75,7 +75,7 @@ char* FileManager::loadUserLuaFilename(char *userDirPath,
     throw e;
   }
   delete userPropertiesPath;
-  
+
   char *userLuaFilename = new char[MAX_FILENAME_LENGTH + 1];
   fgets(userLuaFilename, MAX_FILENAME_LENGTH, userPropertiesFile);
   int userLuaLen = (int) strlen(userLuaFilename);
@@ -233,9 +233,7 @@ char* FileManager::stripLastExtension(const char *filename) {
 // Caller takes ownership of *userDir and *userFilename memory.
 void FileManager::loadUserFileData(const char *srcBaseDir,
     const char *srcFilename, char **userDir, char **userFilename,
-    const char *metaFilename, const char *cacheDir)
-    throw (FileNotFoundException*, ZipperException*,
-           PackagedSymlinkException*) {
+    const char *metaFilename, const char *cacheDir) {
   char *filePath = getFilePath(srcBaseDir, srcFilename);
   if (!fileExists(filePath)) {
     FileNotFoundException *e = new FileNotFoundException(filePath);
@@ -254,7 +252,7 @@ void FileManager::loadUserFileData(const char *srcBaseDir,
     char *absCacheDir = getAbsFilePath(cacheDirAndSubDir);
     delete cacheDirAndSubDir;
     *userDir = absCacheDir;
-    
+
     if (!fileExists(*userDir)) {
       createDirectory(*userDir);
       zipper_->unpackFile(filePath, *userDir);
@@ -315,8 +313,7 @@ bool FileManager::hasSymlinks(const char *userDir) {
 // same as the input or the location in the cache that we extracted to.
 void FileManager::loadStageFileData(const char *stagesBaseDir,
     const char *srcFilename, char **stagesDir, char **stageFilename,
-    const char *cacheDir) throw (FileNotFoundException*, ZipperException*,
-                                 PackagedSymlinkException*) {
+    const char *cacheDir) {
   loadUserFileData(stagesBaseDir, srcFilename, stagesDir, stageFilename,
                    STAGE_METAFILE, cacheDir);
 }
@@ -327,16 +324,13 @@ void FileManager::loadStageFileData(const char *stagesBaseDir,
 // same as the input or the location in the cache that we extracted to.
 void FileManager::loadShipFileData(const char *shipsBaseDir,
     const char *srcFilename, char **shipDir, char **shipFilename,
-    const char *cacheDir) throw (FileNotFoundException*, ZipperException*,
-                                 PackagedSymlinkException*) {
+    const char *cacheDir) {
   loadUserFileData(shipsBaseDir, srcFilename, shipDir, shipFilename,
                    SHIP_METAFILE, cacheDir);
 }
 
 char* FileManager::getStageDescription(const char *stagesBaseDir,
-    const char *srcFilename, const char *cacheDir)
-    throw (FileNotFoundException*, ZipperException*,
-           PackagedSymlinkException*) {
+    const char *srcFilename, const char *cacheDir) {
   char *stagesDir;
   char *stageFilename;
   loadStageFileData(stagesBaseDir, srcFilename, &stagesDir, &stageFilename,
@@ -429,9 +423,7 @@ bool FileManager::isZipFilename(const char *filename) {
 void FileManager::packageCommon(lua_State *userState,
     const char *userAbsBaseDir, const char *userFilename, const char *version,
     const char *metaFilename, int prevFiles, int numFiles, char **packFilenames,
-    const char *tmpDir, bool obfuscate, bool force)
-    throw (InvalidLuaFilenameException*, LuaException*, ZipperException*,
-           FileExistsException*) {
+    const char *tmpDir, bool obfuscate, bool force) {
   // For stages, prevFiles stage ships are already loaded into packFilenames.
   // Load the rest from the Lua __FILES table, on the stack.
   int x = prevFiles;
@@ -461,7 +453,7 @@ void FileManager::packageCommon(lua_State *userState,
   }
 
   char *filesDir;
-      
+
   if (obfuscate) {
     filesDir = new char[strlen(tmpDir) + 1];
     strcpy(filesDir, tmpDir);
@@ -497,7 +489,7 @@ void FileManager::packageCommon(lua_State *userState,
   fout.flush();
   fout.close();
   delete slashedUserFilename;
-  
+
   if (obfuscate) {
     for (int x = 0; x < numFiles; x++) {
       if (packFilenames[x] != 0) {
@@ -505,7 +497,7 @@ void FileManager::packageCommon(lua_State *userState,
             (strlen(tmpDir) + strlen(BB_DIRSEP) + strlen(packFilenames[x]));
         char *outputFilename = new char[outputFilenameLen + 1];
         sprintf(outputFilename, "%s%s%s", tmpDir, BB_DIRSEP, packFilenames[x]);
-        
+
         char *outputDir = parseDir(outputFilename);
         createDirectoryIfNecessary(outputDir);
         try {
@@ -518,12 +510,12 @@ void FileManager::packageCommon(lua_State *userState,
           delete outputDir;
           throw e;
         }
-        
+
         delete outputFilename;
       }
     }
   }
-  
+
   delete outputFilename;
 
   int numInputFiles = numFiles;
@@ -554,7 +546,7 @@ void FileManager::packageCommon(lua_State *userState,
     packagingListener_->packagingComplete(packFilenames, numFiles, obfuscate,
                                           destFilename);
   }
-  
+
   if (obfuscate) {
     recursiveDelete(tmpDir);
   }
@@ -566,13 +558,12 @@ void FileManager::packageCommon(lua_State *userState,
 }
 
 void FileManager::crawlFiles(lua_State *L, const char *startFile,
-    BerryBotsEngine *engine)
-    throw (InvalidLuaFilenameException*, LuaException*) {
+    BerryBotsEngine *engine) {
   if (luaL_loadfile(L, startFile)
       || engine->callUserLuaCode(L, 0, "", PCALL_VALIDATE)) {
     throwForLuaError(L, "Failed to load file for crawling: %s ");
   }
-  
+
   lua_getfield(L, LUA_REGISTRYINDEX, "__FILES");
   int numFiles = (int) lua_objlen(L, -1);
   int numFiles2 = 0;
@@ -595,15 +586,12 @@ void FileManager::crawlFiles(lua_State *L, const char *startFile,
 
 void FileManager::packageStage(const char *stagesBaseDir, const char *stageName,
     const char *version, const char *cacheDir, const char *tmpDir,
-    bool obfuscate, bool force)
-    throw (FileNotFoundException*, InvalidLuaFilenameException*,
-           LuaException*, ZipperException*, FileExistsException*,
-           InvalidStageShipException*) {
+    bool obfuscate, bool force) {
   checkLuaFilename(stageName);
   char *stageAbsBaseDir = getAbsFilePath(stagesBaseDir);
   lua_State *stageState;
   initStageState(&stageState, stageAbsBaseDir);
-  
+
   BerryBotsEngine engine(0, this, 0);
   Stage *stage = engine.getStage();
   if (luaL_loadfile(stageState, stageName)
@@ -703,7 +691,7 @@ void FileManager::packageStage(const char *stagesBaseDir, const char *stageName,
     delete packFilenames;
     throw e;
   }
-  
+
   delete stageAbsBaseDir;
   lua_close(stageState);
   for (int x = 0; x < numFiles; x++) {
@@ -726,9 +714,7 @@ void FileManager::packageStage(const char *stagesBaseDir, const char *stageName,
 //     "bots/battlebot.lua", and shipName would be "voidious/zero.lua".
 void FileManager::packageShip(const char *shipBaseDir, const char *shipName,
     const char *version, const char *cacheDir, const char *tmpDir,
-    bool obfuscate, bool force)
-    throw (FileNotFoundException*, InvalidLuaFilenameException*,
-           LuaException*, ZipperException*, FileExistsException*) {
+    bool obfuscate, bool force) {
   checkLuaFilename(shipName);
   char *shipAbsBaseDir = getAbsFilePath(shipBaseDir);
   lua_State *shipState;
@@ -815,8 +801,7 @@ void FileManager::fixSlashes(char *filename) {
   delete slashSlash;
 }
 
-char* FileManager::readFile(const char *filename)
-    throw (FileNotFoundException*) {
+char* FileManager::readFile(const char *filename) {
   FILE *f = fopen(filename, "r");
   if (f == 0) {
     throw new FileNotFoundException(filename);
@@ -939,8 +924,7 @@ char* FileManager::parseDir(const char *dirAndFilename) {
   }
 }
 
-void FileManager::checkLuaFilename(const char *filename)
-    throw (InvalidLuaFilenameException*) {
+void FileManager::checkLuaFilename(const char *filename) {
   if (!isLuaFilename(filename)) {
     throw new InvalidLuaFilenameException(filename);
   }
@@ -952,8 +936,7 @@ static int writer(lua_State* L, const void* p, size_t size, void* u) {
 }
 
 void FileManager::saveBytecode(const char *srcFile, const char *outputFile,
-                               const char *luaCwd)
-    throw (LuaException*) {
+                               const char *luaCwd) {
   lua_State *saveState = luaL_newstate();
   lua_setcwd(saveState, luaCwd);
   if (luaL_loadfile(saveState, srcFile) != 0) {
@@ -979,8 +962,7 @@ void FileManager::deleteFromCache(const char *cacheDir, const char *filename) {
   delete cacheFilePath;
 }
 
-void FileManager::throwForLuaError(lua_State *L, const char *formatString)
-    throw (LuaException*) {
+void FileManager::throwForLuaError(lua_State *L, const char *formatString) {
   const char *luaMessage = lua_tostring(L, -1);
   int messageLen = (int) (strlen(formatString) + strlen(luaMessage) - 2);
   char *errorMessage = new char[messageLen + 1];
@@ -988,7 +970,7 @@ void FileManager::throwForLuaError(lua_State *L, const char *formatString)
   LuaException *e = new LuaException(errorMessage);
   delete errorMessage;
   lua_close(L);
-  
+
   throw e;
 }
 
@@ -997,11 +979,11 @@ LuaException::LuaException(const char *details) {
   sprintf(message_, "Lua processing failure: %s", details);
 }
 
-const char* LuaException::what() const throw() {
+const char* LuaException::what() {
   return message_;
 }
 
-LuaException::~LuaException() throw() {
+LuaException::~LuaException() {
   delete message_;
 }
 
@@ -1010,11 +992,11 @@ FileNotFoundException::FileNotFoundException(const char *filename) {
   sprintf(message_, "File not found: %s", filename);
 }
 
-FileNotFoundException::~FileNotFoundException() throw() {
+FileNotFoundException::~FileNotFoundException() {
   delete message_;
 }
 
-const char* FileNotFoundException::what() const throw() {
+const char* FileNotFoundException::what() {
   return message_;
 }
 
@@ -1026,11 +1008,11 @@ InvalidLuaFilenameException::InvalidLuaFilenameException(const char *filename) {
   strcpy(message_, errorMessage.c_str());
 }
 
-InvalidLuaFilenameException::~InvalidLuaFilenameException() throw() {
+InvalidLuaFilenameException::~InvalidLuaFilenameException() {
   delete message_;
 }
 
-const char* InvalidLuaFilenameException::what() const throw() {
+const char* InvalidLuaFilenameException::what() {
   return message_;
 }
 
@@ -1039,11 +1021,11 @@ FileExistsException::FileExistsException(const char *filename) {
   strcpy(filename_, filename);
 }
 
-FileExistsException::~FileExistsException() throw() {
+FileExistsException::~FileExistsException() {
   delete filename_;
 }
 
-const char* FileExistsException::what() const throw() {
+const char* FileExistsException::what() {
   return filename_;
 }
 
@@ -1052,11 +1034,11 @@ PackagedSymlinkException::PackagedSymlinkException(const char *details) {
   sprintf(message_, "Lua processing failure: %s", details);
 }
 
-const char* PackagedSymlinkException::what() const throw() {
+const char* PackagedSymlinkException::what() {
   return message_;
 }
 
-PackagedSymlinkException::~PackagedSymlinkException() throw() {
+PackagedSymlinkException::~PackagedSymlinkException() {
   delete message_;
 }
 
@@ -1067,10 +1049,10 @@ InvalidStageShipException::InvalidStageShipException(const char *filename) {
   strcpy(message_, errorMessage.c_str());
 }
 
-InvalidStageShipException::~InvalidStageShipException() throw() {
+InvalidStageShipException::~InvalidStageShipException() {
   delete message_;
 }
 
-const char* InvalidStageShipException::what() const throw() {
+const char* InvalidStageShipException::what() {
   return message_;
 }

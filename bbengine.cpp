@@ -345,7 +345,7 @@ TeamResult** BerryBotsEngine::getTeamResults() {
     }
     results[x] = newResult;
   }
-  
+
   return results;
 }
 
@@ -450,7 +450,7 @@ static int traceback(lua_State *L) {
 }
 
 int BerryBotsEngine::callUserLuaCode(lua_State *L, int nargs,
-    const char *errorMsg, int callStyle) throw (EngineException*) {
+    const char *errorMsg, int callStyle) {
   int base = lua_gettop(L) - nargs;
   lua_pushcfunction(L, traceback);
   lua_insert(L, base);
@@ -499,7 +499,7 @@ void *BerryBotsEngine::timer(void *vargs) {
 // .lua file, in which case we just load it directly; or a stage packaged as a
 // .tar.gz file, in which case we extract it to the cache and load from there.
 void BerryBotsEngine::initStage(const char *stagesBaseDir,
-    const char *stageName, const char *cacheDir) throw (EngineException*) {
+    const char *stageName, const char *cacheDir) {
   if (stagesDir_ != 0 || stageFilename_ != 0) {
     throw new EngineException(stageName,
                               "Already initialized stage for this engine.");
@@ -574,7 +574,7 @@ void BerryBotsEngine::initStage(const char *stagesBaseDir,
 // directly; or a ship/team packaged as a .tar.gz file, in which case we extract
 // it to the cache and load from there.
 void BerryBotsEngine::initShips(const char *shipsBaseDir, char **teamNames,
-    int numTeams, const char *cacheDir) throw (EngineException*) {
+    int numTeams, const char *cacheDir) {
   int userTeams = numTeams;
   int numStageShips = stage_->getStageShipCount();
   numShips_ = (userTeams * teamSize_) + numStageShips;
@@ -637,7 +637,7 @@ void BerryBotsEngine::initShips(const char *shipsBaseDir, char **teamNames,
       if (shipFilename != 0) {
         delete shipFilename ;
       }
-      
+
       EngineException *eie = new EngineException(filename, ze->what());
       delete ze;
       throw eie;
@@ -651,7 +651,7 @@ void BerryBotsEngine::initShips(const char *shipsBaseDir, char **teamNames,
       if (shipFilename != 0) {
         delete shipFilename ;
       }
-      
+
       EngineException *eie = new EngineException(filename, pse->what());
       delete pse;
       throw eie;
@@ -771,7 +771,7 @@ void BerryBotsEngine::initShips(const char *shipsBaseDir, char **teamNames,
       properties->thrusterG = properties->thrusterB = 0;
       properties->thrusterR = 255;
       properties->engine = this;
-  
+
       strncpy(properties->name, defaultShipName, defaultNameLength);
       properties->name[defaultNameLength] = '\0';
       initShipRound(ship);
@@ -925,10 +925,10 @@ void BerryBotsEngine::shipPrint(lua_State *L, const char *text) {
   replayBuilder_->addLogEntry(this->getTeam(L), gameTime_, text);
 }
 
-void BerryBotsEngine::processTick() throw (EngineException*) {
+void BerryBotsEngine::processTick() {
   gameTime_++;
   physicsOver_ = false;
-  updateTeamShipsAlive();    
+  updateTeamShipsAlive();
   stage_->updateTeamVision(teams_, numTeams_, ships_, numShips_, teamVision_);
   stage_->clearStaleUserGfxs(gameTime_);
   copyShips(oldShips_, prevShips_, numShips_);
@@ -968,7 +968,7 @@ void BerryBotsEngine::processTick() throw (EngineException*) {
   }
 }
 
-void BerryBotsEngine::processStageRun() throw (EngineException*) {
+void BerryBotsEngine::processStageRun() {
   copyShips(ships_, stageShips_, numShips_);
   if (stageWorld_ != 0) {
     stageWorld_->time = gameTime_;
@@ -1125,8 +1125,7 @@ void BerryBotsEngine::printLuaErrorToShipConsole(lua_State *L,
   }
 }
 
-void BerryBotsEngine::throwForLuaError(lua_State *L, const char *formatString)
-    throw (EngineException*) {
+void BerryBotsEngine::throwForLuaError(lua_State *L, const char *formatString) {
   char *errorMessage = formatLuaError(L, formatString);
   EngineException *e = new EngineException(errorMessage);
   delete errorMessage;
@@ -1154,11 +1153,11 @@ EngineException::EngineException(const char *filename, const char *details) {
   strcpy(message_, errorMessage.c_str());
 }
 
-const char* EngineException::what() const throw() {
+const char* EngineException::what() {
   return message_;
 }
 
-EngineException::~EngineException() throw() {
+EngineException::~EngineException() {
   delete message_;
 }
 

@@ -33,17 +33,14 @@ class GuiZipper : public Zipper {
     ~GuiZipper();
     virtual void packageFiles(const char *outputFile, const char *baseDir,
         char **filenames, int numFiles, bool binary,
-        const char *absMetaFilename, const char *metaFilename)
-        throw (ZipperException*);
-    virtual void unpackFile(const char *zipFile, const char *outputDir)
-        throw (ZipperException*);
+        const char *absMetaFilename, const char *metaFilename);
+    virtual void unpackFile(const char *zipFile, const char *outputDir);
   private:
     void packageSingleFile(const char *absFilename, const char *filename,
-        struct archive *a, bool binary) throw (ZipperException*);
+        struct archive *a, bool binary);
     ssize_t copyData(struct archive *archiveRead, struct archive *archiveWrite,
-        const char *userDirPath) throw (ZipperException*);
-    void checkForErrors(const char *message, struct archive *a, long r)
-        throw (ZipperException*);
+        const char *userDirPath);
+    void checkForErrors(const char *message, struct archive *a, long r);
 };
 
 #endif
