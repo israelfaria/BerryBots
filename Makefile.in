@@ -47,7 +47,7 @@ RPI_SOURCES += cliprinthandler.cpp clipackagereporter.cpp libshapes.c oglinit.c
 RPI_SOURCES += zipper.cpp tarzipper.cpp bbrunner.cpp relativebasedir.cpp
 RPI_SOURCES += relativerespath.cpp replaybuilder.cpp ./luajit/src/libluajit.a
 
-RPI_CFLAGS =  -I./luajit/src -I./stlsoft-1.9.116/include -I/opt/vc/include
+RPI_CFLAGS =  -I./luajit/src -I./stlsoft/include -I/opt/vc/include
 RPI_CFLAGS += -I/opt/vc/include/interface/vcos/pthreads
 RPI_CFLAGS += -I/opt/vc/include/interface/vmcs_host/linux
 
@@ -86,7 +86,7 @@ ifneq ($(LIBARCHIVE_PATH), )
 endif
 OSX_EXTRA_SOURCES += /usr/lib/libz.dylib /usr/lib/libiconv.dylib
 
-OSX_CFLAGS = -I./luajit/src -I./stlsoft-1.9.116/include
+OSX_CFLAGS = -I./luajit/src -I./stlsoft/include
 OSX_LDFLAGS = 
 
 ifneq ($(LIBARCHIVE_PATH), )
@@ -117,7 +117,7 @@ OSX_LDFLAGS += -ldl -pagezero_size 10000 -image_base 100000000 -stdlib=libc++
 # osxcli: Sources and flags for building CLI on Mac OS X / Cocoa
 OSXCLI_EXTRA_SOURCES = relativebasedir.cpp relativerespath.cpp
 OSXCLI_EXTRA_SOURCES += ./luajit/src/libluajit.a
-OSXCLI_CFLAGS =  -I./luajit/src -I./stlsoft-1.9.116/include
+OSXCLI_CFLAGS =  -I./luajit/src -I./stlsoft/include
 OSXCLI_LDFLAGS =
 
 ifneq ($(LIBARCHIVE_PATH), )
@@ -149,7 +149,7 @@ ifneq ($(LIBARCHIVE_PATH), )
   LINUX_EXTRA_SOURCES += ${LIBARCHIVE_PATH}/.libs/libarchive.a
 endif
 
-LINUX_CFLAGS =  -I./luajit/src -I./stlsoft-1.9.116/include
+LINUX_CFLAGS =  -I./luajit/src -I./stlsoft/include
 LINUX_CFLAGS += -Wno-deprecated-declarations
 LINUX_LDFLAGS =
 
@@ -181,7 +181,7 @@ LINUX_LDFLAGS += -lsfml-graphics -lsfml-window -lsfml-system -lz -ldl -lpthread
 # linuxcli: Sources and flags for building CLI on Linux / GTK
 LINUXCLI_EXTRA_SOURCES = relativebasedir.cpp relativerespath.cpp
 LINUXCLI_EXTRA_SOURCES += ./luajit/src/libluajit.a
-LINUXCLI_CFLAGS =  -I./luajit/src -I./stlsoft-1.9.116/include
+LINUXCLI_CFLAGS =  -I./luajit/src -I./stlsoft/include
 LINUXCLI_CFLAGS += -Wno-deprecated-declarations
 LINUXCLI_LDFLAGS =
 
@@ -207,7 +207,7 @@ LINUXCLI_LDFLAGS += -lpthread
 
 ##############################################################################
 # webui: Flags for building headless / save to replay on any platform.
-WEBUI_CFLAGS =  -I./luajit/src -I./stlsoft-1.9.116/include
+WEBUI_CFLAGS =  -I./luajit/src -I./stlsoft/include
 WEBUI_LDFLAGS = -ldl -lpthread
 
 ifeq ($(.DEFAULT_GOAL), osx)

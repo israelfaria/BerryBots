@@ -2,3 +2,7 @@
 	path = luajit
 	url = https://github.com/israelfaria/LuaJIT.git
 	branch = berrybots
+[submodule "stlsoft"]
+	path = stlsoft
+	url = https://github.com/israelfaria/STLSoft-1.10.git
+	branch = berrybots
